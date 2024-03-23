@@ -1,22 +1,21 @@
 use anchor_lang::prelude::*;
 use crate::state::PrizeConfig;
-use anchor_spl::{token_interface::{TokenAccount, Mint}, associated_token::AssociatedToken};
+use anchor_spl::{token::{TokenAccount, Mint}, associated_token::AssociatedToken};
 use anchor_spl::token::Token;
-use anchor_spl::token_interface::TokenInterface;
 
 #[derive(Accounts)]
 #[instruction(seed: u64)]
 pub struct InitializePrize<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
-    pub prize_mint: InterfaceAccount<'info, Mint>,
+    pub prize_mint: Account<'info, Mint>,
     #[account(
     init,
     payer = user,
     associated_token::mint = prize_mint,
     associated_token::authority = prize_auth
     )]
-    pub particular_prize_vault: InterfaceAccount<'info, TokenAccount>,
+    pub particular_prize_vault: Account<'info, TokenAccount>,
     ///CHECKED: This is not dangerous. It's just used for signing.
     #[account(
     seeds = [b"prize_auth"],
@@ -32,7 +31,7 @@ pub struct InitializePrize<'info> {
     )]
     pub prize_config: Account<'info, PrizeConfig>,
     pub associated_token_program: Program<'info, AssociatedToken>,
-    pub token_program: Interface<'info, TokenInterface>,
+    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
 }
 
