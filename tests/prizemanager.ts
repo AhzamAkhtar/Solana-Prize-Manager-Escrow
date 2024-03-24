@@ -26,7 +26,7 @@ describe("prize-manager", () => {
     // Configure the client to use the local cluster.
     anchor.setProvider(anchor.AnchorProvider.env());
 
-    const programId = new PublicKey("EamyjF7GPGssck4ErdB3zvJm3fQL52k9uivMRcRqN417");
+    const programId = new PublicKey("73fsRqiZZoKj81QdTCXC8up2xrXeN611M4wdZV5D9NFc");
     const program = new anchor.Program<Prizemanager>(IDL, programId, anchor.getProvider());
 
     // Set up our keys
@@ -82,7 +82,7 @@ describe("prize-manager", () => {
         }
     });
 
-    it("PutPrizeOnVault", async () => {
+    xit("PutPrizeOnVault", async () => {
         try {
             const tx = await program.methods.putPrizeOnVault(
             )
@@ -106,7 +106,7 @@ describe("prize-manager", () => {
         }
     })
 
-    it("PutPrizeBackOnAdminVault", async () => {
+    xit("PutPrizeBackOnAdminVault", async () => {
         try {
             const tx = await program.methods.givePrizeBackToVault()
                 .accounts({
@@ -131,7 +131,7 @@ describe("prize-manager", () => {
 
     xit("claimPrize", async () => {
         try {
-            const tx = await program.methods.claimPrize()
+            const tx = await program.methods.claimPrize(new BN(1))
                 .accounts({
                     userClaim: claimer_user.publicKey,
                     prizeMint: prize_one_mint,

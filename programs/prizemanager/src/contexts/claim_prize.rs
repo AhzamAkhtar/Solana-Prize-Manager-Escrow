@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{Mint, Token, TokenAccount,Transfer,transfer};
+use anchor_spl::token::{Mint, Token, TokenAccount, Transfer, transfer};
 use crate::PrizeConfig;
 
 #[derive(Accounts)]
@@ -42,14 +42,18 @@ pub struct ClaimPrize<'info> {
 
 impl<'info> ClaimPrize<'info> {
     pub fn claim_prize(
-        &mut self
+        &mut self,
+        amount: u64,
     ) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.particular_prize_vault.to_account_info(),
             to: self.claimer_ata.to_account_info(),
             authority: self.prize_auth.to_account_info(),
         };
-        let ctx = CpiContext::new(self.token_program.to_account_info(), cpi_accounts);
-        transfer(ctx , 1)
+        let seeds = &[&b"prize_auth"[..], &[self.prize_config.prize_bump]];
+
+        let signer_seeds = &[&seeds[..]];
+        let ctx = CpiContext::new_with_signer(self.token_program.to_account_info(), cpi_accounts, signer_seeds);
+        transfer(ctx, amount)
     }
 }
