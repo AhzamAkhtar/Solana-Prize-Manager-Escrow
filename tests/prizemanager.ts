@@ -26,12 +26,12 @@ describe("prize-manager", () => {
     // Configure the client to use the local cluster.
     anchor.setProvider(anchor.AnchorProvider.env());
 
-    const programId = new PublicKey("73fsRqiZZoKj81QdTCXC8up2xrXeN611M4wdZV5D9NFc");
+    const programId = new PublicKey("5KoYYoYuHL19B1EFjPNu9i3xcvbdxrqq5qyXHuasJfQ7");
     const program = new anchor.Program<Prizemanager>(IDL, programId, anchor.getProvider());
 
     // Set up our keys
     const initializer = Keypair.fromSecretKey(bs58.decode(wallet));
-    const claimer_user = Keypair.fromSecretKey(bs58.decode(wallet_two))
+    const claimer_user = Keypair.fromSecretKey(bs58.decode(wallet_three))
 
     // Random seed
     const seed = new BN(randomBytes(8));
@@ -131,9 +131,9 @@ describe("prize-manager", () => {
 
     xit("claimPrize", async () => {
         try {
-            const tx = await program.methods.claimPrize(new BN(1))
+            const tx = await program.methods.claimPrize()
                 .accounts({
-                    userClaim: claimer_user.publicKey,
+                    user: claimer_user.publicKey,
                     prizeMint: prize_one_mint,
                     particularPrizeVault: particular_prize_vault,
                     claimerAta: claimer_ata,
@@ -143,7 +143,7 @@ describe("prize-manager", () => {
                     associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
                     systemProgram: SystemProgram.programId,
                 })
-                .signers([initializer, claimer_user])
+                .signers([claimer_user , initializer])
                 .rpc({skipPreflight: true})
             await confirmTx(tx)
             console.log("Your transaction signature", tx);

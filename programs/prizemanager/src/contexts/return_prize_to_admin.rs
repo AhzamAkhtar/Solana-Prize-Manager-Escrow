@@ -15,7 +15,8 @@ pub struct GivePrizeBackToAdmin<'info> {
     )]
     pub particular_prize_vault: Account<'info, TokenAccount>,
     #[account(
-    mut,
+    init_if_needed,
+    payer = user,
     associated_token::mint = prize_mint,
     associated_token::authority = user
     )]

@@ -6,7 +6,7 @@ pub use contexts::*;
 
 use anchor_lang::prelude::*;
 
-declare_id!("73fsRqiZZoKj81QdTCXC8up2xrXeN611M4wdZV5D9NFc");
+declare_id!("5KoYYoYuHL19B1EFjPNu9i3xcvbdxrqq5qyXHuasJfQ7");
 
 #[program]
 pub mod prizemanager {
@@ -33,10 +33,9 @@ pub mod prizemanager {
     }
 
     pub fn claim_prize(
-        ctx: Context<ClaimPrize>,
-        amount: u64,
+        ctx: Context<ClaimPrize>
     ) -> Result<()> {
-        ctx.accounts.claim_prize(amount)
+        ctx.accounts.claim_prize()
     }
 }
 

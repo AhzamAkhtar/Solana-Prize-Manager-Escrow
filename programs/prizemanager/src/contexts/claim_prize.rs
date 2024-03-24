@@ -6,7 +6,7 @@ use crate::PrizeConfig;
 #[derive(Accounts)]
 pub struct ClaimPrize<'info> {
     #[account(mut)]
-    pub user_claim: Signer<'info>,
+    pub user: Signer<'info>,
     pub prize_mint: Account<'info, Mint>,
     #[account(
     mut,
@@ -16,9 +16,9 @@ pub struct ClaimPrize<'info> {
     pub particular_prize_vault: Account<'info, TokenAccount>,
     #[account(
     init,
-    payer = user_claim,
+    payer = user,
     associated_token::mint = prize_mint,
-    associated_token::authority = user_claim
+    associated_token::authority = user
     )]
     pub claimer_ata: Account<'info, TokenAccount>,
     ///CHECKED : This is not dangerous , It's just used for signing
@@ -42,8 +42,7 @@ pub struct ClaimPrize<'info> {
 
 impl<'info> ClaimPrize<'info> {
     pub fn claim_prize(
-        &mut self,
-        amount: u64,
+        &mut self
     ) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.particular_prize_vault.to_account_info(),
@@ -54,6 +53,6 @@ impl<'info> ClaimPrize<'info> {
 
         let signer_seeds = &[&seeds[..]];
         let ctx = CpiContext::new_with_signer(self.token_program.to_account_info(), cpi_accounts, signer_seeds);
-        transfer(ctx, amount)
+        transfer(ctx, 1)
     }
 }

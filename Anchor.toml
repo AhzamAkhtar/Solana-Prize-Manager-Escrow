@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-prizemanager = "73fsRqiZZoKj81QdTCXC8up2xrXeN611M4wdZV5D9NFc"
+prizemanager = "5KoYYoYuHL19B1EFjPNu9i3xcvbdxrqq5qyXHuasJfQ7"
 
 [registry]
 url = "https://frosty-smart-smoke.solana-devnet.quiknode.pro/011aa36eee4c55c5bd8b2290980d614e2fc2c171/"
