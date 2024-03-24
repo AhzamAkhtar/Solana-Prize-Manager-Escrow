@@ -11,7 +11,7 @@ import {
     createAccount,
     mintTo,
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync
 } from "@solana/spl-token"
 import {randomBytes} from "crypto"
 import {assert} from "chai"
@@ -26,13 +26,12 @@ describe("prize-manager", () => {
     // Configure the client to use the local cluster.
     anchor.setProvider(anchor.AnchorProvider.env());
 
-    const programId = new PublicKey("7iA4wp9pCEEHR3nxCxXdQSrxruqBwFUbMMYdSE9gRuSj");
+    const programId = new PublicKey("EamyjF7GPGssck4ErdB3zvJm3fQL52k9uivMRcRqN417");
     const program = new anchor.Program<Prizemanager>(IDL, programId, anchor.getProvider());
 
     // Set up our keys
-    const initializer= Keypair.fromSecretKey(bs58.decode(wallet));
-    const initializer2 = Keypair.fromSecretKey(bs58.decode(wallet_two))
-    const gamer_vault = Keypair.fromSecretKey(bs58.decode(wallet_three))
+    const initializer = Keypair.fromSecretKey(bs58.decode(wallet));
+    const claimer_user = Keypair.fromSecretKey(bs58.decode(wallet_two))
 
     // Random seed
     const seed = new BN(randomBytes(8));
@@ -47,13 +46,16 @@ describe("prize-manager", () => {
     // ATAs
     let particular_prize_vault: PublicKey;
     let admin_prize_vault: PublicKey;
+    let claimer_ata: PublicKey;
 
     it("Create mints, tokens and ATAs", async () => {
         prize_one_mint = new PublicKey("BjwKL4x9TjoBgzkgBW14bzn1ocu7HX8up63qXG9AFWE9")
         particular_prize_vault = await getAssociatedTokenAddress(prize_one_mint, prize_auth, true, tokenProgram);
         admin_prize_vault = await getAssociatedTokenAddress(prize_one_mint, initializer.publicKey, false, tokenProgram)
+        claimer_ata = await getAssociatedTokenAddress(prize_one_mint, claimer_user.publicKey, false, tokenProgram)
         console.log(particular_prize_vault.toBase58())
         console.log(admin_prize_vault.toBase58())
+        console.log(claimer_ata.toBase58())
     })
 
     it("Initialize", async () => {
@@ -82,7 +84,8 @@ describe("prize-manager", () => {
 
     it("PutPrizeOnVault", async () => {
         try {
-            const tx = await program.methods.putPrizeOnVault()
+            const tx = await program.methods.putPrizeOnVault(
+            )
                 .accounts({
                     user: initializer.publicKey,
                     prizeAuth: prize_auth,
@@ -95,6 +98,52 @@ describe("prize-manager", () => {
                     systemProgram: SystemProgram.programId
                 })
                 .signers([initializer])
+                .rpc({skipPreflight: true})
+            await confirmTx(tx)
+            console.log("Your transaction signature", tx);
+        } catch (e) {
+            console.log(e)
+        }
+    })
+
+    it("PutPrizeBackOnAdminVault", async () => {
+        try {
+            const tx = await program.methods.givePrizeBackToVault()
+                .accounts({
+                    user: initializer.publicKey,
+                    prizeAuth: prize_auth,
+                    prizeMint: prize_one_mint,
+                    particularPrizeVault: particular_prize_vault,
+                    adminPrizeVault: admin_prize_vault,
+                    prizeConfig: prize_config,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId
+                })
+                .signers([initializer])
+                .rpc({skipPreflight: true})
+            await confirmTx(tx)
+            console.log("Your transaction signature", tx);
+        } catch (e) {
+            console.log(e)
+        }
+    })
+
+    xit("claimPrize", async () => {
+        try {
+            const tx = await program.methods.claimPrize()
+                .accounts({
+                    userClaim: claimer_user.publicKey,
+                    prizeMint: prize_one_mint,
+                    particularPrizeVault: particular_prize_vault,
+                    claimerAta: claimer_ata,
+                    prizeAuth: prize_auth,
+                    prizeConfig: prize_config,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
+                })
+                .signers([initializer, claimer_user])
                 .rpc({skipPreflight: true})
             await confirmTx(tx)
             console.log("Your transaction signature", tx);

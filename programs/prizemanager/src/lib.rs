@@ -6,7 +6,7 @@ pub use contexts::*;
 
 use anchor_lang::prelude::*;
 
-declare_id!("7iA4wp9pCEEHR3nxCxXdQSrxruqBwFUbMMYdSE9gRuSj");
+declare_id!("EamyjF7GPGssck4ErdB3zvJm3fQL52k9uivMRcRqN417");
 
 #[program]
 pub mod prizemanager {
@@ -24,6 +24,18 @@ pub mod prizemanager {
         ctx: Context<PutPrizeOnVault>,
     ) -> Result<()> {
         ctx.accounts.put_prize_on_vault()
+    }
+
+    pub fn give_prize_back_to_vault(
+        ctx: Context<GivePrizeBackToAdmin>,
+    ) -> Result<()> {
+        ctx.accounts.give_prize_back_to_admin()
+    }
+
+    pub fn claim_prize(
+        ctx: Context<ClaimPrize>,
+    ) -> Result<()> {
+        ctx.accounts.claim_prize()
     }
 
 }
